@@ -1,100 +1,155 @@
-# 📝 Changelog
+# Changelog
 
-Semua perubahan signifikan pada project **CasperVerse** didokumentasikan di file ini.
-Format mengikuti [Keep a Changelog](https://keepachangelog.com/id/1.1.0/) dan penomoran versi mengikuti [Semantic Versioning](https://semver.org/lang/id/).
+All notable changes to CasperAI are documented in this file.
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
+versioning follows [Semantic Versioning](https://semver.org/).
 
----
+## [4.2.0] — 2026-08-09
 
-## [3.0.0] — 2026-08-09 🏛️ Konsolidasi Besar
+### Added
+- 80 new personas (total: 200): higher education (UNPAD, Harvard, thesis,
+  scholarships), games (Harvest Moon, God of War, farming sim, RPG, esports),
+  language & communication (grammar, speaking, interviewing, CV & cover-letter
+  writing, professional email, presentation), web development (website
+  building, free hosting, HTML/CSS, JavaScript, WordPress, SEO, GitHub Pages),
+  career (LinkedIn, networking, salary negotiation, remote work, freelancing,
+  portfolio), productivity, personal finance, digital literacy, creative
+  fields (photography, videography, design, music production, podcasting),
+  and Indonesian culture (cuisine, tourism, traditions, regional languages).
 
-### 🔄 Diubah
-- **Seluruh 42 otak** dilebur menjadi **satu file** `otak_casper.brain` (sebelumnya 48 file `.brain` terpisah).
-- **Seluruh bahan belajar** (62 file korpus) dilebur menjadi **satu file** `regular.txt` dengan label per-blok.
-- **19 script Python** dirampingkan menjadi **5 file** esensial: `casperverse.py`, `train_besar.py`, `train_token.py`, `belajar_online.py`, `evaluasi.py`.
-- `casperverse.py` kini memuat otak dari file gabungan (loader `_muat_semua()`).
-- `evaluasi.py` ditulis ulang menjadi *health-check* per-domain yang membaca dari `regular.txt`.
-
-### 🗑️ Dihapus
-- Script fase lama yang sudah tergantikan (`nano1.py`, `sekolah.py`, `kuliah_*.py`, `chat.py`, `ngobrol.py`, `train_specialist.py`, `gen_*.py`, `fetch_*.py`).
-- Riwayat git lokal (untuk efisiensi ukuran).
-
-### 📚 Dokumentasi
-- README ditulis ulang dengan gaya profesional (daftar isi, badge, struktur lengkap).
-- `CHANGELOG.md` dibuat (file ini).
-
-> 💡 Versi ini menetapkan bentuk final yang ramping: hanya butuh **2 file** untuk menjalankan Casper.
+### Changed
+- Parameter count: 19.33M → 24.15M.
+- Persona count: 120 → 200.
 
 ---
 
-## [2.3.0] — 2026-08-09 🪪 Identitas & Belajar Mandiri
+## [4.1.0] — 2026-08-09
 
-### ✨ Ditambahkan
-- **Otak identitas** (`identitas`): Casper mengenali dirinya sebagai *CasperAI dari CasperVerse family*, diciptakan oleh **Gen Z (genzxseventh)**.
-- **Kepribadian & rules** ditanamkan: ramah, jujur, sopan, tidak mengarang fakta.
-- **`belajar_online.py`**: Casper dapat mengumpulkan artikel Wikipedia (ID/EN) sendiri dan melatih otaknya.
-- Otak `online` 🧭 hasil belajar mandiri (LLM, neural network, machine learning, budaya Nusantara).
+### Added
+- 20 new personas (total: 120):
+  - Cybersecurity (defensive/educational): `white_hat`, `grey_hat`,
+    `keamanan_siber`, `pengatasi_jailbreak`, `kriptografi`, `keamanan_data`,
+    `etika_hacking`, `keamanan_jaringan`, `kesadaran_keamanan`,
+    `keamanan_password`, `social_engineering_defense`, `privasi_digital`,
+    `detektif_siber`, `bug_bounty`, `osint_edukasi`, `ctf`.
+  - Personal development: `stoikisme`, `mindfulness`, `rasa_syukur`,
+    `resiliensi`.
+- Refined routing: disambiguated overlapping security keywords
+  (password → `keamanan_password`, encryption → `kriptografi`,
+  firewall → `keamanan_jaringan`).
 
-### 🍽️ Data Baru
-- `indo_extra3`, `inggris_extra3`, `korpus_online` (+390K karakter).
-
----
-
-## [2.2.0] — 2026-08-08 🔤 Generasi Per-Token
-
-### ✨ Ditambahkan
-- **`train_token.py`**: arsitektur word-level dengan **embedding 64-dimensi** (bukan one-hot).
-- Otak percakapan utama (`bicara`, `curhat`, `motivasi`, `jokes`, `gombal`) di-upgrade ke generasi token.
-- **Efek streaming mengetik** di terminal, seperti LLM modern.
-- Deteksi *word-boundary* pada router agar kata pendek tidak salah cocok.
-
-### 🔧 Diperbaiki
-- Kata tidak lagi terpotong ("ran" → "orang").
-- Jokes berhenti tepat setelah punchline.
+### Changed
+- Parameter count: 18.07M → 19.33M.
+- Security content scoped to defense, ethics, and awareness.
 
 ---
 
-## [2.1.0] — 2026-08-08 🏋️ Peningkatan Kapasitas Massal
+## [4.0.0] — 2026-08-09
 
-### 🔄 Diubah
-- Otak-otak pengetahuan lemah di-upgrade ke **kapasitas besar** (konteks 16, hidden 384×192).
-- Penambahan data besar-besaran (+935K karakter: budaya Indonesia, sejarah dunia, filsafat).
+### Added
+- 52 new personas (total: 100): formal logic, emotions, collective
+  consciousness, speaking style, social interaction, crypto, blockchain,
+  YouTube, novelist & creative writing, school-to-university subjects
+  (physics, chemistry, biology, algebra, geometry, calculus, statistics,
+  economics), research methodology, Eastern philosophy, mental health,
+  productivity, leadership, and more.
+- `train_cepat.py`: lightweight word-level trainer for rapid iteration.
+- `gen_brains.py`: educational corpus generator for mass persona creation.
+- Token throughput indicator (`*N token/s*`) displayed per response.
 
-### 📈 Hasil
-- `tanaman` 0.65 → **0.028** (rekor terendah), `sejarah` → 0.045, `kode` → 0.15, `catur` → 0.31, `filsafat` → 0.44.
-- Rata-rata loss keluarga: **0.55 → 0.25**.
-
----
-
-## [2.0.0] — 2026-08-08 🌌 The Multiverse
-
-### ✨ Ditambahkan
-- Otak tunggal **di-split menjadi keluarga spesialis** — lahirnya konsep CasperVerse.
-- **Router konteks otomatis** berbasis kata kunci + deteksi hitungan + deteksi peribahasa.
-- **Tool use**: kalkulator internal untuk soal matematika.
-- Puluhan kepribadian baru: wibu, kode, hack, catur, chef, curhat, dongeng, dan banyak lagi.
+### Changed
+- Persona count: 48 → 100.
+- Parameter count: 8.4M → 18.07M.
 
 ---
 
-## [1.0.0] — 2026-08-08 👶 Fase Otak Tunggal
+## [3.0.0] — 2026-08-09
 
-### ✨ Ditambahkan
-- Pelatihan bertahap pada satu otak: pengetahuan umum → wibu → koding → hacker etis → catur → seniman (jokes, prosa, horor).
-- Mekanisme **SEEDS** agar jawaban Q&A bersih tanpa gema.
-- Koreksi bug alfabet pada otak-otak kecil.
+### Changed
+- Consolidated all 42 personas into a single artifact (`otak_casper.brain`).
+- Consolidated 62 corpus files into a single training corpus (`regular.txt`).
+- Reduced 19 scripts to 5 core modules.
+- Rewrote `evaluasi.py` as a per-domain health check over the merged corpus.
+
+### Removed
+- Superseded phase scripts (`nano1.py`, `sekolah.py`, `kuliah_*.py`,
+  `chat.py`, `ngobrol.py`, `train_specialist.py`, one-off generators,
+  legacy fetchers).
+
+### Documentation
+- Professional README rewrite; this changelog introduced.
 
 ---
 
-## [0.1.0] — 2026-08-08 🌱 Kelahiran NANO-1
+## [2.3.0] — 2026-08-09
 
-### ✨ Ditambahkan
-- Jaringan saraf karakter-level pertama dibangun dari nol dengan NumPy.
-- Arsitektur: one-hot → 2 hidden layer (`tanh`) → softmax, optimizer Adam manual.
-- Lahir dengan **109.000 parameter**, hanya mampu mengoceh.
+### Added
+- `identitas` persona: self-knowledge and creator attribution.
+- Personality traits and behavioral rules (honesty, politeness, safety).
+- `belajar_online.py`: autonomous Wikipedia acquisition with self-training.
+- `online` persona trained on self-collected data (LLM, neural networks,
+  machine learning, Indonesian culture).
+
+### Data
+- `indo_extra3`, `inggris_extra3`, `korpus_online` (+390K characters).
 
 ---
 
-<div align="center">
+## [2.2.0] — 2026-08-08
 
-*Perjalanan dari 109 ribu menjadi 8,4 juta parameter — tumbuh ±77 kali lipat.* 📈
+### Added
+- `train_token.py`: word-level architecture with 64-d embeddings.
+- Conversational personas upgraded to token generation
+  (`bicara`, `curhat`, `motivasi`, `jokes`, `gombal`).
+- Terminal streaming output.
+- Word-boundary matching in the router to prevent short-keyword collisions.
 
-</div>
+### Fixed
+- Eliminated character truncation in conversational output.
+- Joke generation now terminates after the punchline.
+
+---
+
+## [2.1.0] — 2026-08-08
+
+### Changed
+- Weak knowledge personas upgraded to large capacity (context 16,
+  hidden 384×192).
+- Corpus expansion: +935K characters (Indonesian culture, world history,
+  philosophy).
+
+### Results
+- Notable loss reductions: `tanaman` 0.65 → 0.028, `sejarah` 0.76 → 0.045,
+  `kode` 0.80 → 0.15, `catur` 0.77 → 0.31, `filsafat` 0.77 → 0.44.
+- Ensemble mean loss: 0.55 → 0.25.
+
+---
+
+## [2.0.0] — 2026-08-08
+
+### Added
+- Split the single model into specialist personas (ensemble architecture).
+- Automatic context router (keyword scoring, arithmetic detection,
+  proverb detection).
+- Tool use: internal calculator for arithmetic queries.
+- Dozens of personas: anime, code, ethical hacking, chess, cooking,
+  emotional support, folklore, and more.
+
+---
+
+## [1.0.0] — 2026-08-08
+
+### Added
+- Progressive single-model training: general knowledge, anime, coding,
+  ethical hacking, chess, creative arts.
+- Seed formatting mechanism for clean Q&A output.
+- Alphabet-coverage fix for small-capacity models.
+
+---
+
+## [0.1.0] — 2026-08-08
+
+### Added
+- Initial character-level neural network implemented from scratch in NumPy:
+  one-hot input, two hidden layers (tanh), softmax output, manual Adam.
+- Initial release at 109,000 parameters.

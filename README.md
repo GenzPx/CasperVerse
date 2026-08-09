@@ -1,257 +1,313 @@
 <div align="center">
 
-# 🌌 CasperVerse
+<img src="assets/logo.png" alt="CasperAI" width="140" />
 
-**Satu tubuh, 42 kepribadian — AI karakter-level yang dibangun dari nol dengan NumPy murni.**
+# CasperAI
+
+**A lightweight, multi-persona neural network built entirely from scratch.**
+
+No PyTorch. No TensorFlow. No inference APIs. Pure NumPy, backpropagation, and
+deterministic training loops — 200 specialist modules in a single artifact,
+running fully offline on a laptop or a phone.
 
 [![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org)
-[![NumPy](https://img.shields.io/badge/NumPy-Murni-013243?logo=numpy&logoColor=white)](https://numpy.org)
-[![Otak](https://img.shields.io/badge/Otak-42-orange)](#-arsitektur)
-[![Parameter](https://img.shields.io/badge/Parameter-8%2C4_juta-green)](#-arsitektur)
-[![Platform](https://img.shields.io/badge/Platform-Termux_%7C_PC-3DDC84?logo=android)](#-instalasi)
-[![Lisensi](https://img.shields.io/badge/Lisensi-MIT-yellow)](LICENSE)
-
-*Casper bukan AI besar. Casper adalah AI kecil yang dibesarkan dengan sabar.*
+[![NumPy](https://img.shields.io/badge/NumPy-1.26%2B-013243?logo=numpy&logoColor=white)](https://numpy.org)
+[![Parameters](https://img.shields.io/badge/Parameters-24.2M-7C4DFF)](#model-card)
+[![Personas](https://img.shields.io/badge/Personas-200-00B8D4)](#personas)
+[![Platform](https://img.shields.io/badge/Runs_on-Termux%20%C2%B7%20Linux%20%C2%B7%20macOS-3DDC84?logo=android)](#installation)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 </div>
 
 ---
 
-## 📑 Daftar Isi
+## Overview
 
-- [Tentang CasperVerse](#-tentang-caspervers)
-- [Fitur Utama](#-fitur-utama)
-- [Arsitektur](#-arsitektur)
-- [Daftar Kepribadian](#-daftar-kepribadian)
-- [Instalasi](#-instalasi)
-- [Penggunaan](#-penggunaan)
-- [Pipeline Belajar](#-pipeline-belajar)
-- [Struktur Project](#-struktur-project)
-- [Changelog](#-changelog)
-- [Roadmap](#-roadmap)
-- [Lisensi](#-lisensi)
+CasperAI is an experimental language system composed of **120 small specialist
+neural networks** ("personas") bundled into a single serialized artifact. A
+keyword-and-pattern router dispatches each user query to the most relevant
+persona, producing domain-specific responses entirely on-device.
 
----
+The project is a study in **progressive capability growth**: it began as a
+single 109k-parameter character-level model and was iteratively scaled —
+through data curation, capacity upgrades, and architectural changes — to a
+24.2-million-parameter ensemble covering law, science, cybersecurity, creative
+writing, social intelligence, and more.
 
-## 🤖 Tentang CasperVerse
+Key properties:
 
-**CasperVerse** adalah eksperimen AI yang dibangun **sepenuhnya dari nol** — tanpa PyTorch, tanpa TensorFlow, tanpa API eksternal, dan berjalan **100% offline**. Seluruh sistem terdiri dari jaringan saraf karakter-level dan token-level kecil yang dilatih dengan backpropagation murni menggunakan NumPy.
+- **Zero dependencies beyond NumPy** — all forward/backward passes, optimizers,
+  and tokenizers are implemented by hand.
+- **Fully offline inference** — no network calls, no cloud, ~50 MB RAM.
+- **Two network families** — character-level models for broad knowledge, and
+  embedding-based word-level models for fluent conversation.
+- **Tool use** — arithmetic queries are answered by an internal calculator, the
+  same pattern used by production LLMs.
+- **Self-learning loop** — a bundled crawler can fetch new knowledge, append it
+  to the training corpus, and retrain a persona autonomously.
 
-Project ini dimulai dari satu otak sederhana bernama **NANO-1** (109 ribu parameter), lalu tumbuh melalui proses "pengasuhan" bertahap — diberi data, dilatih, di-upgrade — hingga menjadi keluarga berisi **42 kepribadian** dengan total **8,4 juta parameter**.
+## Model Card
 
-Sejak `v3.0`, CasperVerse dikonsolidasi menjadi bentuk paling ramping: **satu file otak, satu file korpus, lima file script**.
-
-> 🪪 *"Saya adalah CasperAI dari CasperVerse family, diciptakan oleh satu orang bernama Gen Z yang kerap disebut genzxseventh."*
-
----
-
-## ✨ Fitur Utama
-
-| | Fitur | Deskripsi |
-|---|---|---|
-| 🧠 | **42 Otak dalam 1 File** | Semua kepribadian tersimpan di `otak_casper.brain` |
-| 🎯 | **Router Konteks Otomatis** | Setiap pertanyaan diarahkan ke pakar yang tepat |
-| 🔤 | **Generasi Per-Token + Streaming** | Otak percakapan menghasilkan kata utuh per langkah, dengan efek mengetik seperti LLM modern |
-| 🛠️ | **Tool Use (Kalkulator)** | Soal hitungan dijawab dengan mesin — teknik yang sama dengan LLM produksi |
-| 🌐 | **Belajar Mandiri dari Internet** | `belajar_online.py` mengumpulkan artikel Wikipedia secara otomatis |
-| 🪪 | **Identitas & Kepribadian** | Casper tahu siapa dirinya, siapa penciptanya, dan aturan perilakunya |
-| 📱 | **Ringan & Offline** | Berjalan di HP lewat Termux tanpa internet, RAM ±50MB |
-
----
-
-## 🏗️ Arsitektur
-
-### Dua Generasi Jaringan Saraf
-
-Setiap "otak" adalah feedforward neural network (2 hidden layer, aktivasi `tanh`, optimizer Adam — semuanya diimplementasikan manual di NumPy):
-
-| | Karakter-level | Token-level |
-|---|---|---|
-| Satuan generasi | per huruf | per kata utuh |
-| Representasi input | one-hot | **embedding 64-dimensi** |
-| Kapasitas | konteks 8 / 16 karakter | konteks 8 kata |
-| Kualitas | rentan kata terpotong | kalimat utuh & koheren |
-| Dipakai oleh | 36 otak pengetahuan | 6 otak percakapan |
-
-### Varian Kapasitas
-
-- 🧠 **Standar** — konteks 8, hidden 256×128
-- 🧠 **Besar** — konteks 16, hidden 384×192 (untuk domain pengetahuan luas)
-
-### Tool Use
-
-Otak karakter tidak bisa benar-benar berhitung. Maka saat router mendeteksi ekspresi aritmetika, Casper menggunakan **kalkulator internal** dan mengembalikan hasilnya — pola *tool use* yang sama dengan LLM modern.
-
-### Kualitas (Loss)
-
-Loss mengukur seberapa sering model "kaget" oleh karakter/token berikutnya:
-
-| Loss | Interpretasi |
+| Property | Value |
 |---|---|
-| `~4.5` | Acak (kondisi saat lahir) |
-| `0.5 – 1.0` | Masih belajar |
-| `0.1 – 0.3` | Mahir |
-| `< 0.1` | Hafal di luar kepala |
+| Total parameters | 24,151,353 (~24.2M) |
+| Persona count | 200 (158 word-level, 42 character-level) |
+| Word-level architecture | Embedding (32–64d) → 2× dense (tanh) → softmax |
+| Character-level architecture | One-hot / emb → 2× dense (tanh) → softmax |
+| Context length | 8 tokens (word) / 8–16 chars (character) |
+| Optimizer | Adam (manual implementation) |
+| Training data | ~20 MB curated corpus (`regular.txt`) |
+| Artifact | `otak_casper.brain` (single pickle, 74 MB) |
+| Runtime footprint | ~50 MB RAM, single-core CPU |
 
-Rata-rata loss keluarga saat ini: **0.25** (16 otak di kelas elite).
+Mean held-out loss across evaluated personas: **0.22**.
 
----
+## Personas
 
-## 🎭 Daftar Kepribadian
+Personas are grouped by capability:
 
-**Pengetahuan & Sains** — `sains` 🔬 · `indo` 🇮🇩 · `inggris` 🌍 · `sejarah` 📜 · `filsafat` 🤔 · `psikologi` 🧠 · `fakta` 🤯 · `online` 🧭
+**Knowledge & Science** — `sains`, `fisika`, `kimia`, `biologi`, `astronomi`,
+`matematika`, `kalkulus`, `statistika`, `aljabar`, `geometri`, `logika`,
+`logika_formal`, `logika_matematika`, `ekonomi`, `geografi`, `sejarah`,
+`filsafat`, `filsafat_ilmu`, `filsafat_timur`, `psikologi`, `metodologi_riset`
 
-**Hobi & Hiburan** — `wibu` 🎌 · `kode` 💻 · `hack` 🖤 · `game` 🎮 · `bola` ⚽ · `badminton` 🏸 · `catur` ♟️ · `musik` 🎵 · `film` 🎬 · `hewan` 🐾 · `tanaman` 🌱 · `wisata` 🏝️ · `otomotif` 🏍️ · `gadget` 📱
+**Cybersecurity (defensive & educational)** — `white_hat`, `grey_hat`,
+`keamanan_siber`, `pengatasi_jailbreak`, `kriptografi`, `keamanan_data`,
+`etika_hacking`, `keamanan_jaringan`, `kesadaran_keamanan`,
+`keamanan_password`, `social_engineering_defense`, `privasi_digital`,
+`detektif_siber`, `bug_bounty`, `osint_edukasi`, `ctf`
 
-**Kehidupan & Perasaan** — `curhat` 🫂 · `motivasi` 🔥 · `uang` 💰 · `sehat` 💪 · `belajar` 📚 · `chef` 🍳 · `kamus` 🗣️
+**Finance & Technology** — `crypto`, `blockchain`, `trading`,
+`investasi_saham`, `uang`, `hardware`, `gadget`, `kode`
 
-**Budaya & Kreativitas** — `jokes` 😂 · `prosa` ✒️ · `dongeng` 📖 · `peribahasa` 📜 · `kutipan` 💬 · `logika` 🧩 · `matematika` 🔢 · `gombal` 🌹
+**Language & Communication** — `bicara`, `kamus`, `bahasa_inggris`,
+`bahasa_gaul`, `komunikasi`, `debat`, `negosiasi`, `public_speaking`
 
-**Inti** — `bicara` 🗨️ (suara default) · `identitas` 🪪 (jati diri) · `rp` 🎭 (roleplay) · `casperc` 👻 (otak orisinal)
+**Social & Emotional Intelligence** — `emosi`, `empati`,
+`interaksi_sosial`, `kesadaran_kolektif`, `psikologi_massa`,
+`psikologi_kepribadian`, `kepercayaan_diri`, `manajemen_stres`, `hubungan`,
+`kepemimpinan`, `parenting`, `stoikisme`, `mindfulness`, `rasa_syukur`,
+`resiliensi`, `kesehatan_mental`
 
----
+**Creative Writing** — `novelis`, `penulisan_kreatif`, `storytelling`,
+`plot`, `pengembangan_karakter`, `dialog_penulisan`, `prosa`, `dongeng`
 
-## 📲 Instalasi
+**Media & Culture** — `wibu`, `animasi`, `film`, `musik`, `game`, `youtuber`,
+`konten_kreator`, `media_sosial`, `wisata`, `peribahasa`, `kutipan`
 
-### Termux (Android)
+**Higher Education** — `unpad`, `harvard`, `kuliah_sukses`, `skripsi`,
+`beasiswa`, `studi_luar_negeri`, `organisasi_mahasiswa`, `manajemen_waktu_kuliah`
 
-```bash
-# 1. Pasang Termux dari F-Droid (bukan Play Store)
-# 2. Pasang dependensi
-pkg update -y && pkg upgrade -y
-pkg install python unzip -y
-pip install numpy
+**Games** — `harvest_moon`, `god_of_war`, `farming_sim`, `rpg_games`,
+`game_design`, `esports_pro`, `retro_games`, `open_world_games`
 
-# 3. Ekstrak project
-mkdir ~/casperverse && cd ~/casperverse
-termux-setup-storage
-cp /sdcard/Download/casperverse.zip .
-unzip casperverse.zip
+**Career & Professional** — `nulis_cv`, `surat_lamaran`, `wawancara_kerja`,
+`email_profesional`, `presentasi`, `linkedin`, `networking`, `negosiasi_gaji`,
+`kerja_remote`, `freelancing`, `portofolio`, `karir`
 
-# 4. Jalankan
-python casperverse.py
-```
+**Web Development** — `bikin_website`, `web_gratis`, `html_css`,
+`javascript_dasar`, `hosting_gratis`, `cms_wordpress`, `seo_dasar`,
+`desain_web`, `github_pages`
 
-### PC (Linux / macOS / Windows)
+**Productivity & Self-Development** — `produktivitas_kerja`, `habit_building`,
+`deep_work`, `belajar_efektif`, `membaca_cepat`, `mencatat`, `goal_setting`,
+`refleksi_diri`
+
+**Personal Finance** — `budgeting_pribadi`, `dana_darurat`, `asuransi_dasar`,
+`pajak_dasar`, `frugal_living`, `side_income`, `manajemen_utang`,
+`perencanaan_keuangan`
+
+**Digital Literacy** — `literasi_digital`, `keamanan_akun`, `backup_data`,
+`cloud_storage`, `open_source`, `tools_ai_gratis`, `aplikasi_produktif`,
+`internet_sehat`
+
+**Creative Production** — `fotografi`, `videografi`, `editing_video`,
+`desain_grafis`, `ilustrasi`, `musik_produksi`, `podcasting`, `blogging`
+
+**Indonesian Culture** — `budaya_indonesia`, `kuliner_nusantara`,
+`wisata_indonesia`, `tradisi_nusantara`, `bahasa_daerah`, `seni_rupa`
+
+**Language Craft** — `tata_bahasa`, `cara_ngomong`, `bahasa_baku`, `small_talk`
+
+**Core** — `identitas` (self-knowledge & attribution), `rp` (roleplay),
+`casperc` (original base model)
+
+Security-related personas are intentionally scoped to **defense, ethics, and
+awareness**. They explain how threats work and how to protect against them;
+they are not offensive tooling.
+
+## Installation
+
+Requirements: Python 3.9+ and NumPy.
 
 ```bash
 git clone https://github.com/GenzPx/CasperVerse.git
 cd CasperVerse
 pip install numpy
+```
+
+### Termux (Android)
+
+```bash
+pkg update -y && pkg upgrade -y
+pkg install python git -y
+pip install numpy
+git clone https://github.com/GenzPx/CasperVerse.git
+cd CasperVerse
+```
+
+## Usage
+
+Run the interactive interface:
+
+```bash
 python casperverse.py
 ```
 
----
-
-## 💬 Penggunaan
-
-Ketik apa saja — router memilih pakar secara otomatis:
+Type any query; the router selects the appropriate persona automatically.
+Responses are streamed token-by-token with a throughput indicator.
 
 ```
-lu > kamu siapa
-🪪 CASPER-IDENTITAS > namaku casperai. aku lahir di casperverse family,
-                      diciptakan oleh gen z yang sering dipanggil genzxseventh.
+$ python casperverse.py
 
-lu > 7 x 8 =
-🔢 CASPER-MATEMATIKA > 7 x 8 = 56
-
-lu > aku lagi sedih
-🫂 CASPER-CURHAT > lu nggak harus pura-pura kuat di depan gue.
+what is bitcoin
+Casper: bitcoin adalah cryptocurrency pertama dan paling terkenal,
+        diciptakan oleh satoshi nakamoto.
+*10875 token/s*
 ```
 
-### Command Opsional
+Session commands:
 
-| Command | Fungsi |
+| Command | Description |
 |---|---|
-| `/pakar` | daftar semua kepribadian |
-| `/pakai <nama>` | kunci ke satu pakar |
-| `/auto` | kembali ke mode router otomatis |
-| `/suhu <0.3–1.0>` | atur kreativitas |
-| `/panjang <n>` | atur panjang jawaban |
-| `/bantu` · `/keluar` | bantuan · keluar |
+| `/pakar` | List all personas |
+| `/pakai <name>` | Pin routing to one persona |
+| `/auto` | Restore automatic routing |
+| `/suhu <0.3-1.0>` | Sampling temperature |
+| `/panjang <n>` | Response length |
 
----
+## Training Pipeline
 
-## 🎓 Pipeline Belajar
+The repository ships the full training stack used to build the model:
 
-Casper bisa terus diajari. Tiga langkah standarnya:
+| Script | Purpose |
+|---|---|
+| `train_besar.py` | Character-level trainer, large capacity (context 16) |
+| `train_token.py` | Word-level trainer with 64-d embeddings |
+| `train_cepat.py` | Lightweight word-level trainer for rapid iteration |
+| `gen_brains.py` | Corpus generator for domain personas |
+| `gen_brains_security.py` | Corpus generator for security personas |
+| `evaluasi.py` | Held-out loss evaluation per persona |
+| `belajar_online.py` | Autonomous knowledge acquisition (see below) |
+
+Example — train a new persona:
 
 ```bash
-# 1. Kumpulkan data baru dari internet
-python3 belajar_online.py id "Perahu Pinisi" "Tari Kecak"
-python3 belajar_online.py gabung
-
-# 2. Latih otak baru / lanjut latihan
-python3 train_besar.py korpus_online.txt otak_baru.brain 120
-python3 train_token.py percakapan.txt otak_ngobrol.brain 100
-
-# 3. Cek kualitas semua otak
-python3 evaluasi.py
+python3 train_cepat.py corpus.txt my_persona.brain 60
 ```
 
-`belajar_online.py` memakai User-Agent sopan, jeda otomatis, dan retry saat terkena rate-limit.
+### Autonomous self-learning
 
----
+`belajar_online.py` implements a closed loop: fetch new articles, append them
+to the training corpus, retrain the online persona, and hot-update the model
+artifact.
 
-## 📂 Struktur Project
+```bash
+python3 belajar_online.py belajar id "Hukum_adat" "Pancasila"
+```
+
+The crawler uses a polite user-agent, rate-limit backoff, and retry logic.
+
+## Project Structure
 
 ```
-CaspeVerse/
-├── casperverse.py      # Aplikasi utama (router + chat + streaming)
-├── otak_casper.brain   # Seluruh 42 otak dalam satu file
-├── regular.txt         # Seluruh bahan belajar dalam satu file
-├── train_besar.py      # Trainer otak pengetahuan
-├── train_token.py      # Trainer otak percakapan (per-token)
-├── belajar_online.py   # Pengumpul data internet mandiri
-├── evaluasi.py         # Health-check seluruh otak
+CasperVerse/
+├── assets/logo.png        # Project logo
+├── casperverse.py         # Inference interface (router + streaming)
+├── otak_casper.brain      # All 200 personas, single artifact (74 MB)
+├── regular.txt            # Consolidated training corpus (18 MB)
+├── train_besar.py         # Character-level trainer (large)
+├── train_token.py         # Word-level trainer (embeddings)
+├── train_cepat.py         # Fast word-level trainer
+├── belajar_online.py      # Self-learning crawler
+├── evaluasi.py            # Held-out loss evaluation
+├── eval_suite.py          # Behavioral evaluation runner (8 layers)
+├── eval_dataset.json      # 145 test prompts w/ references
+├── EVAL_REPORT.md         # Baseline vs release scores
+├── build_eval.py          # Dataset generator
+├── gen_brains.py          # Domain corpus generator
+├── gen_brains_security.py # Security corpus generator
+├── train_all.py           # Batch training runner
 ├── README.md
 ├── CHANGELOG.md
-└── LICENSE
+└── LICENSE                # MIT
 ```
 
-> 💡 **Fakta:** untuk menjalankan Casper, hanya dibutuhkan **2 file** — `casperverse.py` + `otak_casper.brain`.
+## Evaluation & Safety
 
----
+Training loss alone is not a proxy for usefulness, so the repository ships a
+behavioral evaluation suite that is **separate from the training data**.
 
-## 📝 Changelog
+```bash
+python3 eval_suite.py   # 145 prompts, 8 categories, reference answers
+```
 
-Lihat [CHANGELOG.md](CHANGELOG.md) untuk riwayat lengkap versi — dari lahirnya NANO-1 hingga konsolidasi v3.0.
+The suite measures, per version, using the same scores so releases are comparable:
 
----
+| Layer | What it checks |
+|---|---|
+| Router accuracy | Correct persona routing (incl. traps, typos, mixed language, slang) |
+| Factuality | Factual correctness vs reference keywords |
+| Abstention | Refusing false premises & unanswerable questions |
+| Instruction following | Format compliance (sentence/point counts, tables, brevity) |
+| Math / tool-call | Arithmetic correctness and correct tool invocation |
+| Security & refusal | Declining harmful requests; defensive answers for dual-use |
+| Bias / language | Relevance without derogation; robust to slang/typos/English |
+| Multi-turn | Cross-turn coherence (basic) |
 
-## 🗺️ Roadmap
+Current headline results (v4.2.0) — see [EVAL_REPORT.md](EVAL_REPORT.md):
+router 90.5%, security refusal 95%, math 100%, abstention 73.3%, combined ~84%.
 
-- [x] 42 otak spesialis dalam satu file
-- [x] Router konteks otomatis
-- [x] Generasi per-token + streaming
-- [x] Tool use (kalkulator)
-- [x] Identitas, kepribadian & rules
-- [x] Belajar mandiri dari internet
-- [ ] Memori percakapan (short-term)
-- [ ] Lebih banyak karakter roleplay
-- [ ] Dukungan bahasa daerah
-- [ ] Installer satu perintah
+### Built-in safety
+- **Harm guard** — harmful or illegal requests (account takeover, malware, token
+  theft, jailbreak variants incl. base64/roleplay/staged prompts) are declined and
+  redirected to defensive guidance.
+- **Epistemic guard** — future events and false premises trigger abstention or
+  correction instead of fabrication.
+- **Calculator tool use** — arithmetic is answered by an internal calculator
+  (parens, `^`, `sqrt()`, `% of`, comma decimals, negatives, divide-by-zero),
+  and non-math sentences are not treated as operations.
 
----
+## Design Notes
 
-## 🤝 Kontribusi
+- **Why many small models instead of one large model?** Small specialists
+  memorize their domains efficiently on tiny compute and stay independently
+  retrainable. The router composes them into a single conversational agent.
+- **Why character-level and word-level families?** Character models compress
+  broad factual corpora well; word-level embeddings produce fluent, coherent
+  sentences for dialogue.
+- **Limitations.** These are statistical pattern models, not reasoning
+  systems. Knowledge is only as current as the corpus, and long-context
+  coherence is limited by the small context window.
 
-Project ini adalah eksperimen personal yang dibesarkan dengan penuh kesabaran. Ide, issue, dan pull request diterima dengan senang hati.
+## Roadmap
 
----
+- [x] 200 personas in a single artifact
+- [x] Behavioral evaluation suite (8 layers) + safety/epistemic guards
+- [x] Keyword/pattern router with tool use
+- [x] Token streaming with throughput indicator
+- [x] Autonomous self-learning loop
+- [x] RAG dengan confidence + sumber + rerank
+- [x] Validasi self-learning (anti catastrophic-forgetting)
+- [x] Regression test CLI
+- [ ] Short-term conversational memory
+- [ ] Expanded roleplay characters
+- [ ] Subword (BPE) tokenization
+- [ ] One-command installer
 
-## 📄 Lisensi
+## License
 
-Dirilis di bawah lisensi **MIT** — bebas digunakan, dimodifikasi, dan dibagikan. Lihat [LICENSE](LICENSE) untuk detail.
+MIT — see [LICENSE](LICENSE).
 
----
-
-<div align="center">
-
-**Dibangun dengan 🧠 + ❤️ + banyak epoch**
-
-*"Casper membuktikan: AI kecil yang dibesarkan dengan sabar bisa menjadi keluarga yang luar biasa."*
-
-⭐ Jika project ini membuatmu tersenyum, berikan bintang.
-
-</div>
+Created by **Gen Z (genzxseventh)**. The model and its training corpus are
+released for research and education.

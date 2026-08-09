@@ -5,7 +5,7 @@ Satu langkah generasi = satu token utuh (bukan per karakter).
 
 Pakai: python3 train_token.py file1+file2 output.brain [epoch] [lanjut]
 """
-import numpy as np, time, pickle, sys, os, re
+import numpy as np, time, pickle, sys, os, re, zlib
 from collections import Counter
 
 CORPUS = sys.argv[1].split("+")
@@ -20,7 +20,7 @@ L = 8           # konteks (jumlah token)
 BATCH = 512
 LR0 = 0.002
 
-rng = np.random.default_rng(hash(OUT) % 100_000)
+rng = np.random.default_rng(zlib.crc32(OUT.encode())%100000)
 mix = "\n".join(open(f, encoding="utf-8").read() for f in CORPUS if os.path.exists(f))
 
 # ---- tokenisasi ----

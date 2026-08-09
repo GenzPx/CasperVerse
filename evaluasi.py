@@ -42,6 +42,12 @@ MAP = {
  "belajar":   ["belajar.txt"],
  "tanaman":   ["tanaman_id.txt"],
  "online":    ["korpus_online.txt"],
+ "hukum":     ["hukum.txt"],
+ "kriminal":  ["kriminal_full.txt"],
+ "politik":   ["politik.txt"],
+ "hardware":  ["hardware.txt"],
+ "animasi":   ["animasi.txt"],
+ "ips":       ["ips.txt"],
 }
 
 # --- parse regular.txt jadi {nama_file: isi} ---

@@ -20,3 +20,5 @@ Thumbs.db
 # Logs & temp
 *.log
 *.tmp
+__pycache__
+PROMPT_SESI_BARU.md
