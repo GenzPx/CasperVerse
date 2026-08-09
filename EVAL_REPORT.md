@@ -67,3 +67,7 @@ jangka panjang masih lemah karena context window kecil — lihat "Kelemahan".
 - Seed training: `hash(OUT)` (per-process) — untuk reproducibility penuh, ganti ke seed tetap.
 - Catat: versi Python, versi NumPy, hash corpus (`regular.txt`), hash model (`otak_casper.brain`),
   dan hyperparameter tiap training.
+
+## Hidden / External Evaluation (v4.9)
+- `eval_hidden.py` (36 item baru, di luar 145): **97.2%**.
+- Mencegah overfit ke FACT_DB/ENUM_DB/145 prompt.
