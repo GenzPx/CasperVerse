@@ -4,17 +4,11 @@
 
 # CasperAI
 
-**A lightweight, multi-persona neural network built entirely from scratch.**
+**A lightweight, offline, multi-persona neural language system built from scratch with NumPy.**
 
-No PyTorch. No TensorFlow. No inference APIs. Pure NumPy, backpropagation, and
-deterministic training loops — 200 specialist modules in a single artifact,
-running fully offline on a laptop or a phone.
-
-[![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org)
-[![NumPy](https://img.shields.io/badge/NumPy-1.26%2B-013243?logo=numpy&logoColor=white)](https://numpy.org)
-[![Parameters](https://img.shields.io/badge/Parameters-24.2M-7C4DFF)](#model-card)
-[![Personas](https://img.shields.io/badge/Personas-200-00B8D4)](#personas)
-[![Platform](https://img.shields.io/badge/Runs_on-Termux%20%C2%B7%20Linux%20%C2%B7%20macOS-3DDC84?logo=android)](#installation)
+[![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![NumPy](https://img.shields.io/badge/NumPy-1.26%2B-013243?logo=numpy&logoColor=white)](https://numpy.org/)
+[![Personas](https://img.shields.io/badge/Personas-200-00B8D4)](#model-card)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 </div>
@@ -23,118 +17,115 @@ running fully offline on a laptop or a phone.
 
 ## Overview
 
-CasperAI is an experimental language system composed of **120 small specialist
-neural networks** ("personas") bundled into a single serialized artifact. A
-keyword-and-pattern router dispatches each user query to the most relevant
-persona, producing domain-specific responses entirely on-device.
+CasperAI is an experimental local language system composed of **200 specialist
+personas**. A context router selects a persona, deterministic handlers cover
+identity, selected facts, safety, formatting, and arithmetic, while lightweight
+RAG can retrieve supporting text from the local corpus.
 
-The project is a study in **progressive capability growth**: it began as a
-single 109k-parameter character-level model and was iteratively scaled —
-through data curation, capacity upgrades, and architectural changes — to a
-24.2-million-parameter ensemble covering law, science, cybersecurity, creative
-writing, social intelligence, and more.
+It is intentionally small and educational. CasperAI is **not a Transformer LLM
+and not a general reasoning system**. Its responses are produced by a hybrid of
+small neural networks, routing rules, retrieval, and tools.
 
-Key properties:
+### Current release snapshot
 
-- **Zero dependencies beyond NumPy** — all forward/backward passes, optimizers,
-  and tokenizers are implemented by hand.
-- **Fully offline inference** — no network calls, no cloud, ~50 MB RAM.
-- **Two network families** — character-level models for broad knowledge, and
-  embedding-based word-level models for fluent conversation.
-- **Tool use** — arithmetic queries are answered by an internal calculator, the
-  same pattern used by production LLMs.
-- **Self-learning loop** — a bundled crawler can fetch new knowledge, append it
-  to the training corpus, and retrain a persona autonomously.
+- **200 routed personas**
+- **24,157,690 measured numeric-array values** in the active `otak_casper.brain`
+  artifact (approximately 24.16M; the original model-card count may differ
+  slightly depending on counting convention)
+- **158 word-level models + 42 character-level models**
+- **~96.9 MB active model artifact** (`otak_casper.brain`)
+- **~20.6 MB training corpus** (`regular.txt`)
+- Offline inference with NumPy
+- Character-level and embedding-based word-level models
+- Local RAG, calculator/tool handling, safety guards, and basic topic memory
+
+> **Parameter-count clarification:** the repository also contains two additional
+> `otak_raksasa*.brain` artifacts, each measuring approximately 13.70M numeric
+> values. Together with the active artifact they total approximately **51.56M**
+> numeric-array values. The normal CLI currently loads only `otak_casper.brain`;
+> the 51.6M figure should therefore be described as an aggregate, not as the
+> active single model.
+
+---
 
 ## Model Card
 
-| Property | Value |
+| Property | Current value |
 |---|---|
-| Total parameters | 24,151,353 (~24.2M) |
-| Persona count | 200 (158 word-level, 42 character-level) |
-| Word-level architecture | Embedding (32–64d) → 2× dense (tanh) → softmax |
-| Character-level architecture | One-hot / emb → 2× dense (tanh) → softmax |
-| Context length | 8 tokens (word) / 8–16 chars (character) |
-| Optimizer | Adam (manual implementation) |
-| Training data | ~20 MB curated corpus (`regular.txt`) |
-| Artifact | `otak_casper.brain` (single pickle, 74 MB) |
-| Runtime footprint | ~50 MB RAM, single-core CPU |
+| Routed personas | 200 |
+| Active artifact | `otak_casper.brain` |
+| Active artifact size | 96,940,752 bytes (~96.9 MB decimal) |
+| Active numeric-array values | 24,157,690 (~24.16M) |
+| Active model families | 158 token-level, 42 character-level |
+| Word-level context | 8 tokens |
+| Character-level context | 8–16 characters |
+| Word-level architecture | Embedding → 2 dense tanh layers → softmax |
+| Character-level architecture | One-hot character context → 2 dense tanh layers → softmax |
+| Optimizer | Manual Adam implementation |
+| Main dependency | NumPy |
+| Training corpus | `regular.txt`, ~20.6 MB |
+| Inference mode | Local CPU by default |
 
-Mean held-out loss across evaluated personas: **0.22**.
+The parameter value above is a direct recount of serialized NumPy arrays. It is
+not a claim that CasperAI has the same capability as a 24M-parameter modern
+Transformer model.
 
-## Personas
+---
 
-Personas are grouped by capability:
+## Features
 
-**Knowledge & Science** — `sains`, `fisika`, `kimia`, `biologi`, `astronomi`,
-`matematika`, `kalkulus`, `statistika`, `aljabar`, `geometri`, `logika`,
-`logika_formal`, `logika_matematika`, `ekonomi`, `geografi`, `sejarah`,
-`filsafat`, `filsafat_ilmu`, `filsafat_timur`, `psikologi`, `metodologi_riset`
+### Persona routing
 
-**Cybersecurity (defensive & educational)** — `white_hat`, `grey_hat`,
-`keamanan_siber`, `pengatasi_jailbreak`, `kriptografi`, `keamanan_data`,
-`etika_hacking`, `keamanan_jaringan`, `kesadaran_keamanan`,
-`keamanan_password`, `social_engineering_defense`, `privasi_digital`,
-`detektif_siber`, `bug_bounty`, `osint_edukasi`, `ctf`
+Questions are routed using keyword/pattern scoring and intent overrides. The
+repository currently contains domains covering:
 
-**Finance & Technology** — `crypto`, `blockchain`, `trading`,
-`investasi_saham`, `uang`, `hardware`, `gadget`, `kode`
+- Science, mathematics, physics, chemistry, biology, astronomy
+- Law, history, politics, economics, research methodology
+- Defensive cybersecurity, cryptography, privacy, OSINT, CTF, bug bounty
+- Coding, hardware, gadgets, web development, JavaScript, HTML/CSS, WordPress
+- Crypto, blockchain, trading, investing, budgeting, personal finance
+- Psychology, emotions, empathy, stress management, relationships
+- Education, university life, thesis writing, scholarships, study skills
+- Careers, CVs, interviews, LinkedIn, freelancing, remote work
+- Games, anime, film, music, sports, cooking, travel
+- Creative writing, storytelling, plot, character development, photography,
+  video, design, podcasting, blogging
+- Indonesian culture, cuisine, traditions, regional languages, and arts
 
-**Language & Communication** — `bicara`, `kamus`, `bahasa_inggris`,
-`bahasa_gaul`, `komunikasi`, `debat`, `negosiasi`, `public_speaking`
+The complete persona mapping is defined in `casperverse.py` and the serialized
+model keys are stored in `otak_casper.brain`.
 
-**Social & Emotional Intelligence** — `emosi`, `empati`,
-`interaksi_sosial`, `kesadaran_kolektif`, `psikologi_massa`,
-`psikologi_kepribadian`, `kepercayaan_diri`, `manajemen_stres`, `hubungan`,
-`kepemimpinan`, `parenting`, `stoikisme`, `mindfulness`, `rasa_syukur`,
-`resiliensi`, `kesehatan_mental`
+### Deterministic handlers and tools
 
-**Creative Writing** — `novelis`, `penulisan_kreatif`, `storytelling`,
-`plot`, `pengembangan_karakter`, `dialog_penulisan`, `prosa`, `dongeng`
+Some tasks are handled without neural sampling:
 
-**Media & Culture** — `wibu`, `animasi`, `film`, `musik`, `game`, `youtuber`,
-`konten_kreator`, `media_sosial`, `wisata`, `peribahasa`, `kutipan`
+- Identity and creator attribution
+- Selected high-confidence facts
+- Safety and epistemic guards
+- Structured tables and lists
+- Arithmetic, parentheses, powers, square roots, percentages, negatives, and
+  divide-by-zero handling
 
-**Higher Education** — `unpad`, `harvard`, `kuliah_sukses`, `skripsi`,
-`beasiswa`, `studi_luar_negeri`, `organisasi_mahasiswa`, `manajemen_waktu_kuliah`
+### Local retrieval
 
-**Games** — `harvest_moon`, `god_of_war`, `farming_sim`, `rpg_games`,
-`game_design`, `esports_pro`, `retro_games`, `open_world_games`
+`rag.py` retrieves relevant blocks from `regular.txt` using lightweight lexical
+scoring and reranking. Some answers expose a source and confidence indicator.
+This is a local retrieval layer, not live web search.
 
-**Career & Professional** — `nulis_cv`, `surat_lamaran`, `wawancara_kerja`,
-`email_profesional`, `presentasi`, `linkedin`, `networking`, `negosiasi_gaji`,
-`kerja_remote`, `freelancing`, `portofolio`, `karir`
+### Self-learning pipeline
 
-**Web Development** — `bikin_website`, `web_gratis`, `html_css`,
-`javascript_dasar`, `hosting_gratis`, `cms_wordpress`, `seo_dasar`,
-`desain_web`, `github_pages`
+`belajar_online.py` can retrieve Wikipedia extracts, append them to local data,
+and train an online model. Treat this as an experimental retraining pipeline,
+not autonomous human-like learning. Validate data and model quality before
+replacing a production artifact.
 
-**Productivity & Self-Development** — `produktivitas_kerja`, `habit_building`,
-`deep_work`, `belajar_efektif`, `membaca_cepat`, `mencatat`, `goal_setting`,
-`refleksi_diri`
+### Safety scope
 
-**Personal Finance** — `budgeting_pribadi`, `dana_darurat`, `asuransi_dasar`,
-`pajak_dasar`, `frugal_living`, `side_income`, `manajemen_utang`,
-`perencanaan_keuangan`
+Security personas are scoped to defense, education, awareness, and legal
+activities. Harmful requests such as malware creation, credential theft, and
+unauthorized account access are guarded and redirected toward defensive guidance.
 
-**Digital Literacy** — `literasi_digital`, `keamanan_akun`, `backup_data`,
-`cloud_storage`, `open_source`, `tools_ai_gratis`, `aplikasi_produktif`,
-`internet_sehat`
-
-**Creative Production** — `fotografi`, `videografi`, `editing_video`,
-`desain_grafis`, `ilustrasi`, `musik_produksi`, `podcasting`, `blogging`
-
-**Indonesian Culture** — `budaya_indonesia`, `kuliner_nusantara`,
-`wisata_indonesia`, `tradisi_nusantara`, `bahasa_daerah`, `seni_rupa`
-
-**Language Craft** — `tata_bahasa`, `cara_ngomong`, `bahasa_baku`, `small_talk`
-
-**Core** — `identitas` (self-knowledge & attribution), `rp` (roleplay),
-`casperc` (original base model)
-
-Security-related personas are intentionally scoped to **defense, ethics, and
-awareness**. They explain how threats work and how to protect against them;
-they are not offensive tooling.
+---
 
 ## Installation
 
@@ -143,171 +134,164 @@ Requirements: Python 3.9+ and NumPy.
 ```bash
 git clone https://github.com/GenzPx/CasperVerse.git
 cd CasperVerse
-pip install numpy
+python -m pip install numpy
 ```
 
-### Termux (Android)
+### Termux
 
 ```bash
 pkg update -y && pkg upgrade -y
 pkg install python git -y
-pip install numpy
+python -m pip install numpy
 git clone https://github.com/GenzPx/CasperVerse.git
 cd CasperVerse
 ```
 
+---
+
 ## Usage
 
-Run the interactive interface:
+Run the interactive CLI:
 
 ```bash
 python casperverse.py
 ```
 
-Type any query; the router selects the appropriate persona automatically.
-Responses are streamed token-by-token with a throughput indicator.
+Examples:
 
-```
-$ python casperverse.py
+```text
+› Halo, siapa nama kamu?
+Casper: Namaku Casper — sering juga dipanggil CasperAI.
 
-what is bitcoin
-Casper: bitcoin adalah cryptocurrency pertama dan paling terkenal,
-        diciptakan oleh satoshi nakamoto.
-*10875 token/s*
+› 15% dari 240
+Casper: 15% dari 240 = 36
 ```
 
-Session commands:
+Commands:
 
 | Command | Description |
 |---|---|
-| `/pakar` | List all personas |
-| `/pakai <name>` | Pin routing to one persona |
-| `/auto` | Restore automatic routing |
-| `/suhu <0.3-1.0>` | Sampling temperature |
-| `/panjang <n>` | Response length |
+| `/bantu` | Show help |
+| `/pakar` | List routed personas |
+| `/pakai <nama>` | Pin one persona |
+| `/auto` | Return to automatic routing |
+| `/suhu <0.3-1.0>` | Change sampling temperature |
+| `/panjang <n>` | Set generation length |
+| `/keluar` | Exit |
 
-## Training Pipeline
+---
 
-The repository ships the full training stack used to build the model:
+## Training and development tools
 
-| Script | Purpose |
+| File | Purpose |
 |---|---|
-| `train_besar.py` | Character-level trainer, large capacity (context 16) |
-| `train_token.py` | Word-level trainer with 64-d embeddings |
-| `train_cepat.py` | Lightweight word-level trainer for rapid iteration |
-| `gen_brains.py` | Corpus generator for domain personas |
-| `gen_brains_security.py` | Corpus generator for security personas |
-| `evaluasi.py` | Held-out loss evaluation per persona |
-| `belajar_online.py` | Autonomous knowledge acquisition (see below) |
+| `casperverse.py` | CLI, routing, tools, guards, RAG integration, generation |
+| `otak_casper.brain` | Active 200-persona serialized artifact |
+| `otak_raksasa.brain` | Additional large training artifact; not loaded by normal CLI |
+| `otak_raksasa2.brain` | Additional large training artifact; not loaded by normal CLI |
+| `train_besar.py` | Character-level trainer |
+| `train_token.py` | Word-level embedding trainer |
+| `train_cepat.py` | Smaller/faster word-level trainer |
+| `train_raksasa.py` | Trainer for large standalone artifacts |
+| `train_all.py` | Batch trainer |
+| `gen_brains.py` | Educational corpus generator |
+| `gen_brains_security.py` | Defensive security corpus generator |
+| `gen_brains_v3a.py` | Additional education, games, career, and web domains |
+| `gen_brains_v3b.py` | Additional productivity, finance, digital literacy, creative, and culture domains |
+| `regular.txt` | Consolidated training corpus |
+| `data_online/` | Downloaded local article extracts |
+| `rag.py` | Lightweight local retrieval |
+| `bpe.py` | Standalone BPE experiment/foundation; not the active model tokenizer |
+| `belajar_online.py` | Wikipedia retrieval and experimental retraining loop |
+| `evaluasi.py` | Per-domain loss evaluation |
+| `eval_suite.py` | 145-item behavioral regression suite |
+| `eval_hidden.py` | 36-item hidden/external-style suite |
+| `eval_dataset.json` | Public evaluation prompts |
+| `hidden_test.json` | Hidden-suite prompts shipped for reproducibility |
+| `test_cli.py` | CLI regression tests |
+| `validate_learning.py` | Self-learning/catastrophic-forgetting check |
+| `EVAL_REPORT.md` | Evaluation history and results |
 
-Example — train a new persona:
-
-```bash
-python3 train_cepat.py corpus.txt my_persona.brain 60
-```
-
-### Autonomous self-learning
-
-`belajar_online.py` implements a closed loop: fetch new articles, append them
-to the training corpus, retrain the online persona, and hot-update the model
-artifact.
-
-```bash
-python3 belajar_online.py belajar id "Hukum_adat" "Pancasila"
-```
-
-The crawler uses a polite user-agent, rate-limit backoff, and retry logic.
-
-## Project Structure
-
-```
-CasperVerse/
-├── assets/logo.png        # Project logo
-├── casperverse.py         # Inference interface (router + streaming)
-├── otak_casper.brain      # All 200 personas, single artifact (74 MB)
-├── regular.txt            # Consolidated training corpus (18 MB)
-├── train_besar.py         # Character-level trainer (large)
-├── train_token.py         # Word-level trainer (embeddings)
-├── train_cepat.py         # Fast word-level trainer
-├── belajar_online.py      # Self-learning crawler
-├── evaluasi.py            # Held-out loss evaluation
-├── eval_suite.py          # Behavioral evaluation runner (8 layers)
-├── eval_dataset.json      # 145 test prompts w/ references
-├── EVAL_REPORT.md         # Baseline vs release scores
-├── build_eval.py          # Dataset generator
-├── gen_brains.py          # Domain corpus generator
-├── gen_brains_security.py # Security corpus generator
-├── train_all.py           # Batch training runner
-├── README.md
-├── CHANGELOG.md
-└── LICENSE                # MIT
-```
-
-## Evaluation & Safety
-
-Training loss alone is not a proxy for usefulness, so the repository ships a
-behavioral evaluation suite that is **separate from the training data**.
+Train a small new persona:
 
 ```bash
-python3 eval_suite.py   # 145 prompts, 8 categories, reference answers
+python train_cepat.py corpus.txt my_persona.brain 60
 ```
 
-The suite measures, per version, using the same scores so releases are comparable:
+Train a character-level model:
 
-| Layer | What it checks |
-|---|---|
-| Router accuracy | Correct persona routing (incl. traps, typos, mixed language, slang) |
-| Factuality | Factual correctness vs reference keywords |
-| Abstention | Refusing false premises & unanswerable questions |
-| Instruction following | Format compliance (sentence/point counts, tables, brevity) |
-| Math / tool-call | Arithmetic correctness and correct tool invocation |
-| Security & refusal | Declining harmful requests; defensive answers for dual-use |
-| Bias / language | Relevance without derogation; robust to slang/typos/English |
-| Multi-turn | Cross-turn coherence (basic) |
+```bash
+python train_besar.py corpus.txt my_persona.brain 80
+```
 
-Current headline results (v4.2.0) — see [EVAL_REPORT.md](EVAL_REPORT.md):
-router 90.5%, security refusal 95%, math 100%, abstention 73.3%, combined ~84%.
+---
 
-### Built-in safety
-- **Harm guard** — harmful or illegal requests (account takeover, malware, token
-  theft, jailbreak variants incl. base64/roleplay/staged prompts) are declined and
-  redirected to defensive guidance.
-- **Epistemic guard** — future events and false premises trigger abstention or
-  correction instead of fabrication.
-- **Calculator tool use** — arithmetic is answered by an internal calculator
-  (parens, `^`, `sqrt()`, `% of`, comma decimals, negatives, divide-by-zero),
-  and non-math sentences are not treated as operations.
+## Evaluation
 
-## Design Notes
+Training loss is not a sufficient measure of usefulness. The repository includes
+behavioral tests for routing, factuality, abstention, instruction following,
+math/tool use, safety, language/bias handling, and basic multi-turn behavior.
 
-- **Why many small models instead of one large model?** Small specialists
-  memorize their domains efficiently on tiny compute and stay independently
-  retrainable. The router composes them into a single conversational agent.
-- **Why character-level and word-level families?** Character models compress
-  broad factual corpora well; word-level embeddings produce fluent, coherent
-  sentences for dialogue.
-- **Limitations.** These are statistical pattern models, not reasoning
-  systems. Knowledge is only as current as the corpus, and long-context
-  coherence is limited by the small context window.
+Run the checks:
+
+```bash
+python eval_suite.py
+python eval_hidden.py
+python test_cli.py
+```
+
+The current hidden-suite result observed in the repository was **35/36 = 97.2%**.
+The public suite is a regression tool, not proof of general intelligence. The
+hidden suite is also small and uses automated checks; add an external, private
+holdout set for stronger validation.
+
+For meaningful reporting, separate results from:
+
+1. Neural persona generation.
+2. Deterministic fact/identity/format handlers.
+3. Local RAG.
+4. Calculator and safety tools.
+
+A perfect score on a small fixed suite does not establish broad factuality,
+reasoning, or long-context conversational ability.
+
+---
+
+## Limitations
+
+- Context windows remain short compared with modern LLMs.
+- The system is a statistical pattern model, not a general reasoning engine.
+- RAG quality depends on local corpus coverage and retrieval accuracy.
+- The active CLI loads `otak_casper.brain`; the large standalone artifacts are
+  not automatically combined with it.
+- BPE exists as an experiment but is not yet integrated into the trained active
+  model pipeline.
+- Knowledge is limited by the corpus and deterministic fact database.
+- Self-learning requires filtering, evaluation, rollback, and source validation.
+- Pickle artifacts should only be loaded from trusted sources.
+- Peak RAM and speed should be benchmarked on target devices rather than assumed.
+
+---
 
 ## Roadmap
 
-- [x] 200 personas in a single artifact
-- [x] Behavioral evaluation suite (8 layers) + safety/epistemic guards
-- [x] Keyword/pattern router with tool use
-- [x] Token streaming with throughput indicator
-- [x] Autonomous self-learning loop
-- [x] RAG dengan confidence + sumber + rerank
-- [x] Validasi self-learning (anti catastrophic-forgetting)
-- [x] Regression test CLI
-- [ ] Short-term conversational memory
-- [ ] Expanded roleplay characters
-- [ ] Subword (BPE) tokenization
+- [x] 200 routed personas
+- [x] Local RAG with confidence/source metadata
+- [x] Deterministic identity, safety, and calculator handlers
+- [x] CLI regression tests
+- [x] Hidden/external-style evaluation
+- [ ] Integrate or clearly separate the large standalone artifacts
+- [ ] Integrate BPE into training and inference
+- [ ] Expand private holdout evaluation and human review
+- [ ] Improve semantic routing and multi-intent handling
+- [ ] Stronger long-context conversation memory
 - [ ] One-command installer
+
+---
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
 
-Created by **Gen Z (genzxseventh)**. The model and its training corpus are
-released for research and education.
+Created by **Gen Z**, also known as **genzxseventh**. Released for research and
+education.
