@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/banner.png" alt="CasperVerse" width="720">
+</p>
+
 <div align="center">
 
 <img src="assets/logo.png" alt="CasperAI" width="140" />
